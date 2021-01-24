@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="SERVICIO DE CONSULTA DE PRECIOS"
+            android:text="SERVICIO DE CONSULTA DE PRECIOSS"
             android:textSize="20sp"
             android:textColor="#fff"
             android:textStyle="bold"
