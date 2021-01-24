@@ -12,7 +12,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
     val siPermiso = 1
     var hilito = Hilo(this)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -21,23 +20,21 @@ class MainActivity : AppCompatActivity() {
             && (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECEIVE_SMS,android.Manifest.permission.SEND_SMS),siPermiso)
         }
-
         hilito.start()
 
         registrar.setOnClickListener {
-            if(nombreP.text.toString() == "" || precioP.text.toString() == ""){
-                Toast.makeText(this,"LLENE TODOS LOS CAMPOS PORFAVOR",Toast.LENGTH_LONG)
+            if(nombreP.text.toString() == "" || CalifP.text.toString() == ""){
+                Toast.makeText(this,"LLENAR TODOS LOS CAMPOS",Toast.LENGTH_LONG)
                     .show()
                 return@setOnClickListener
             }
-            //GUARDAR SOBRE TABLA SQLITE
             try {
                 var baseDatos = BaseDatos(this, "entrantes", null, 1)
                 var insertar = baseDatos.writableDatabase
                 var nombre = nombreP.text.toString().toLowerCase()
-                var precio = precioP.text.toString().toInt()
+                var calificacion = CalifP.text.toString().toInt()
 
-                var SQL = "INSERT INTO COMIDA VALUES('${nombre}','${precio}')"
+                var SQL = "INSERT INTO ALUMNO VALUES('${nombre}','${calificacion}')"
 
                 insertar.execSQL(SQL)
                 baseDatos.close()
@@ -46,25 +43,21 @@ class MainActivity : AppCompatActivity() {
                     .show()
             }
             nombreP.setText("")
-            precioP.setText("")
-            Toast.makeText(this,"PLATILLO REGISTRADO",Toast.LENGTH_LONG)
+            CalifP.setText("")
+            Toast.makeText(this,"ALUMNO REGISTRADO",Toast.LENGTH_LONG)
                 .show()
         }
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if(requestCode == siPermiso){
             mensajeRecibir()
         }
-
     }
-
     private fun mensajeRecibir() {
         AlertDialog.Builder(this).setMessage("SE OTORGARON PERMISOS DE LEER Y ENVIAR").show()
     }
@@ -73,7 +66,6 @@ class MainActivity : AppCompatActivity() {
 
 class Hilo(p: MainActivity): Thread(){
     var puntero = p
-
     override fun run(){
         super.run()
 
@@ -92,7 +84,7 @@ class Hilo(p: MainActivity): Thread(){
 
                     } while (cursor.moveToNext())
                 } else {
-                    ultimo = "SIN MENSAJES AUN, TABLA VACIA"
+                    ultimo = "0 Mensajes"
                 }
                 puntero.runOnUiThread {
                     puntero.ultimoMensaje.setText(ultimo)

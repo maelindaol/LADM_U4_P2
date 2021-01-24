@@ -12,27 +12,20 @@ import java.lang.Exception
 
 class SmsReceiver : BroadcastReceiver() {
     var cliente = ""
-
     override fun onReceive(context: Context, intent: Intent) {
         val extras = intent.extras
-
         if(extras != null) {
             var sms = extras.get("pdus") as Array<Any>
-
             for(indice in sms.indices){
                 var formato = extras.getString("format")
-
                 var smsMensaje = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                     SmsMessage.createFromPdu(sms[indice] as ByteArray, formato)
                 } else {
                     SmsMessage.createFromPdu(sms[indice] as ByteArray)
                 }
-
                 var celularOrigen = smsMensaje.originatingAddress
                 var contenidoSMS = smsMensaje.messageBody.toString()
-
                 cliente = celularOrigen!!
-
                 //GUARDAR SOBRE TABLA SQLITE
                 try {
                     var baseDatos = BaseDatos(context, "entrantes", null, 1)
@@ -47,23 +40,22 @@ class SmsReceiver : BroadcastReceiver() {
 
                 val info = contenidoSMS.toLowerCase().split(" ");
                 var respuesta = ""
-                var producto = ""
-                var costo = ""
+                var alumn = ""
+                var calificacion = ""
 
-                if(info.size>1 && info[0] == "precio") {
-                    //CONSULTAR EN TABLA SQLITE
+                if(info.size>1 && info[0] == "calificacion") {
                     try {
                         val cursor = BaseDatos(context,"entrantes",null,1)
                             .readableDatabase
                             .rawQuery("SELECT * FROM COMIDA WHERE NOMBRE = '${info[1]}'",null)
 
                         if(cursor.moveToFirst()){
-                            producto = cursor.getString(0)
-                            costo = cursor.getInt(1).toString()
+                            alumn = cursor.getString(0)
+                            calificacion = cursor.getInt(1).toString()
 
-                            respuesta = "El costo de $producto es de $costo pesos"
+                            respuesta = "La calificacion de $alumn es de $calificacion %"
                         } else {
-                            respuesta = "Lo sentimos, no contamos con ese platillo"
+                            respuesta = "Alumno no registrado!!"
                         }
                         cursor.close()
                     } catch (e: Exception) {
@@ -71,10 +63,10 @@ class SmsReceiver : BroadcastReceiver() {
                             .show()
                     }
                 } else {
-                    respuesta = "Por favor respete la sintaxis\nMande la palabra 'PRECIO' seguido del nombre del platillo del que quiere saber el costo \n EJEMPLO:\n PRECIO HAMBURGUESA"
+                    respuesta = "ERROR \n Ingrese 'CALIFICACION' y el nombre alumno"
                 }
                 SmsManager.getDefault().sendTextMessage(cliente,null, respuesta,null,null)
-                Toast.makeText(context,"SE ENVIO RESPUESTA",Toast.LENGTH_LONG)
+                Toast.makeText(context,"GRACIAS",Toast.LENGTH_LONG)
                     .show()
             }
         }
